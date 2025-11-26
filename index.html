@@ -3,653 +3,851 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Laporan Inspeksi APAR RSUD Talaud - K3RS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Manajemen Outsourcing RSUD Talaud</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --primary-color: #1e40af;
+            --secondary-color: #3b82f6;
+            --accent-color: #f59e0b;
+            --dark-bg: #0f172a;
+            --light-bg: #f8fafc;
         }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+
+        * {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Glass morphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Glow effect */
+        .glow {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Fade in animation */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        .hover-scale {
-            transition: transform 0.2s ease;
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
         }
-        
-        .hover-scale:hover {
-            transform: scale(1.02);
-        }
-        
-        .slide-in {
-            animation: slideIn 0.3s ease-out;
-        }
-        
+
+        /* Slide in animation */
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
         }
-        
-        .gradient-header {
-            background: var(--primary-gradient);
+
+        .slide-in {
+            animation: slideIn 0.4s ease-out;
         }
-        
-        .gradient-footer {
-            background: var(--primary-gradient);
+
+        /* Pulse animation */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
         }
-        
-        .nav-link {
-            position: relative;
+
+        .pulse-hover:hover {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        /* Card hover effect */
+        .card-hover {
             transition: all 0.3s ease;
         }
-        
-        .nav-link::after {
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Tab indicator */
+        .tab-indicator {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal animation */
+        .modal-enter {
+            animation: modalEnter 0.3s ease-out;
+        }
+
+        @keyframes modalEnter {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
             content: '';
             position: absolute;
-            bottom: -2px;
-            left: 0;
+            top: 50%;
+            left: 50%;
             width: 0;
-            height: 2px;
-            background-color: white;
-            transition: width 0.3s ease;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
-        
-        .nav-link:hover::after,
-        .nav-link.active::after {
-            width: 100%;
+
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
         }
-        
-        .room-card {
+
+        /* Form input styles */
+        .form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
-            cursor: pointer;
         }
-        
-        .room-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
-        
-        .month-item {
-            transition: all 0.3s ease;
-            cursor: pointer;
+
+        /* Status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
         }
-        
-        .month-item:hover {
-            background-color: rgba(99, 102, 241, 0.1);
-            transform: translateX(5px);
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
         }
-        
-        .report-detail {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease;
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
         }
-        
-        .report-detail.active {
-            max-height: 2000px;
+
+        /* Responsive 18:9 ratio */
+        .container-18-9 {
+            max-width: 100%;
+            padding: 0 1rem;
         }
-        
-        @media print {
-            .no-print { display: none !important; }
-            body { font-size: 12px; }
+
+        @media (min-width: 768px) {
+            .container-18-9 {
+                max-width: 800px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container-18-9 {
+                max-width: 1600px;
+            }
+        }
+
+        /* Google Drive status indicator */
+        .google-drive-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .google-drive-connected {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .google-drive-disconnected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="text-white">
     <!-- Header -->
-    <header class="gradient-header text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <i class="fas fa-fire-extinguisher text-2xl mr-3"></i>
-                    <h1 class="text-xl font-bold">Sistem Inspeksi APAR RSUD Talaud</h1>
+    <header class="glass sticky top-0 z-50 fade-in">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        RSUD Talaud
+                    </h1>
+                    <p class="text-sm text-gray-400">Manajemen Outsourcing</p>
                 </div>
-                
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm">
-                        <i class="fas fa-user mr-1"></i>
-                        <span id="currentUser">K3RS</span>
-                    </span>
-                    <button onclick="logout()" class="text-white hover:text-gray-200 transition">
-                        <i class="fas fa-sign-out-alt"></i>
+                    <div id="googleDriveStatus" class="google-drive-status google-drive-disconnected">
+                        <i class="fas fa-cloud mr-2"></i>
+                        <span>Google Drive: Tersambung</span>
+                    </div>
+                    <button id="connectGoogleDrive" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all">
+                        <i class="fas fa-link mr-2"></i>Sambungkan Google Drive
+                    </button>
+                    <button class="relative p-2 hover:bg-white/10 rounded-lg transition-all">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <button class="flex items-center space-x-2 hover:bg-white/10 rounded-lg px-3 py-2 transition-all">
+                        <img src="https://picsum.photos/seed/admin/40/40" alt="Admin" class="w-8 h-8 rounded-full">
+                        <span class="text-sm">Admin</span>
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Navigation -->
-    <nav class="bg-gray-800 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex space-x-8">
-                <button onclick="showSection('dashboard')" class="nav-link py-4 px-2 font-medium active">
-                    <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 container-18-9">
+        <!-- Dashboard Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 fade-in">
+            <div class="glass rounded-xl p-6 card-hover">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-blue-400 text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold" id="satpamCount">0</span>
+                </div>
+                <h3 class="text-lg font-semibold mb-1">Satpam</h3>
+                <p class="text-sm text-gray-400">Total Personil</p>
+            </div>
+
+            <div class="glass rounded-xl p-6 card-hover">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-car text-green-400 text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold" id="sopirCount">0</span>
+                </div>
+                <h3 class="text-lg font-semibold mb-1">Sopir</h3>
+                <p class="text-sm text-gray-400">Total Personil</p>
+            </div>
+
+            <div class="glass rounded-xl p-6 card-hover">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-broom text-purple-400 text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold" id="kebersihanCount">0</span>
+                </div>
+                <h3 class="text-lg font-semibold mb-1">Kebersihan</h3>
+                <p class="text-sm text-gray-400">Total Personil</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="glass rounded-xl p-1 mb-6 fade-in">
+            <div class="flex space-x-1">
+                <button class="tab-btn flex-1 py-3 px-6 rounded-lg text-center font-medium transition-all" data-tab="satpam">
+                    <i class="fas fa-shield-alt mr-2"></i>Satpam
                 </button>
-                <button onclick="showSection('reports')" class="nav-link py-4 px-2 font-medium">
-                    <i class="fas fa-file-alt mr-2"></i>Laporan
+                <button class="tab-btn flex-1 py-3 px-6 rounded-lg text-center font-medium transition-all" data-tab="sopir">
+                    <i class="fas fa-car mr-2"></i>Sopir
+                </button>
+                <button class="tab-btn flex-1 py-3 px-6 rounded-lg text-center font-medium transition-all" data-tab="kebersihan">
+                    <i class="fas fa-broom mr-2"></i>Kebersihan
+                </button>
+            </div>
+            <div class="tab-indicator h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg mt-1"></div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="glass rounded-xl p-6 fade-in">
+            <!-- Search and Actions -->
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
+                <div class="relative w-full md:w-96">
+                    <input type="text" id="searchInput" placeholder="Cari nama, NIP, atau divisi..." 
+                           class="form-input w-full pl-10 pr-4 py-2 rounded-lg text-white placeholder-gray-400">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="flex space-x-3">
+                    <button id="exportBtn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-all">
+                        <i class="fas fa-file-export mr-2"></i>Export
+                    </button>
+                    <button id="addBtn" class="btn-primary px-6 py-2 rounded-lg text-white font-medium transition-all">
+                        <i class="fas fa-plus mr-2"></i>Tambah Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="text-left py-3 px-4">No</th>
+                            <th class="text-left py-3 px-4">Nama</th>
+                            <th class="text-left py-3 px-4">NIP</th>
+                            <th class="text-left py-3 px-4">Divisi</th>
+                            <th class="text-left py-3 px-4">Status</th>
+                            <th class="text-left py-3 px-4">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable">
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center items-center mt-6 space-x-2">
+                <button class="px-3 py-1 rounded-lg hover:bg-white/10 transition-all">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="px-3 py-1 rounded-lg bg-blue-500/20 text-blue-400">1</button>
+                <button class="px-3 py-1 rounded-lg hover:bg-white/10 transition-all">2</button>
+                <button class="px-3 py-1 rounded-lg hover:bg-white/10 transition-all">3</button>
+                <button class="px-3 py-1 rounded-lg hover:bg-white/10 transition-all">
+                    <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
         </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Dashboard Section -->
-        <section id="dashboardSection" class="fade-in">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h2>
-            
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-lg shadow hover-scale">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm">Total Lokasi</p>
-                            <p class="text-3xl font-bold text-gray-800 mt-2">22</p>
-                        </div>
-                        <i class="fas fa-building text-3xl text-blue-500"></i>
-                    </div>
-                </div>
-                
-                <div class="bg-white p-6 rounded-lg shadow hover-scale">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm">APAR Valid</p>
-                            <p class="text-3xl font-bold text-green-600 mt-2">15</p>
-                        </div>
-                        <i class="fas fa-check-circle text-3xl text-green-500"></i>
-                    </div>
-                </div>
-                
-                <div class="bg-white p-6 rounded-lg shadow hover-scale">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm">APAR Perlu Perbaikan</p>
-                            <p class="text-3xl font-bold text-yellow-600 mt-2">5</p>
-                        </div>
-                        <i class="fas fa-exclamation-triangle text-3xl text-yellow-500"></i>
-                    </div>
-                </div>
-                
-                <div class="bg-white p-6 rounded-lg shadow hover-scale">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm">APAR Tidak Valid</p>
-                            <p class="text-3xl font-bold text-red-600 mt-2">2</p>
-                        </div>
-                        <i class="fas fa-times-circle text-3xl text-red-500"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Status APAR per Lokasi</h3>
-                    <canvas id="statusChart"></canvas>
-                </div>
-                
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Trend Inspeksi 2024</h3>
-                    <canvas id="trendChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <!-- Reports Section -->
-        <section id="reportsSection" class="hidden fade-in">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Laporan Inspeksi APAR 2024</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Special Rooms -->
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('igd')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">IGD</h3>
-                    <p class="text-sm text-gray-600">Instalasi Gawat Darurat</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Perlu Perbaikan</span>
-                    </div>
-                    <div id="igd-detail" class="report-detail mt-4">
-                        <div class="border-t pt-4">
-                            <h4 class="font-medium mb-2">Detail Pemeriksaan</h4>
-                            <ul class="text-sm space-y-1">
-                                <li>Kondisi Tabung: Baik (Tidak ada keretakan, goresan)</li>
-                                <li>Tekanan: Abnormal (Indikator merah/kuning)</li>
-                                <li>Konektor: Tidak bocor</li>
-                                <li>Tanda Pemakaian: Pernah dipakai</li>
-                                <li>Inspektur: K3RS</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('medrec')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">MEDREC</h3>
-                    <p class="text-sm text-gray-600">Medical Record</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Perlu Perbaikan</span>
-                    </div>
-                    <div id="medrec-detail" class="report-detail mt-4">
-                        <div class="border-t pt-4">
-                            <h4 class="font-medium mb-2">Detail Pemeriksaan</h4>
-                            <ul class="text-sm space-y-1">
-                                <li>Kondisi Tabung: Baik (Tidak ada keretakan, goresan)</li>
-                                <li>Tekanan: Abnormal (Indikator merah/kuning)</li>
-                                <li>Konektor: Tidak bocor</li>
-                                <li>Tanda Pemakaian: Pernah dipakai</li>
-                                <li>Inspektur: K3RS</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('kantor')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">KANTOR</h3>
-                    <p class="text-sm text-gray-600">Kantor</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Perlu Perbaikan</span>
-                    </div>
-                    <div id="kantor-detail" class="report-detail mt-4">
-                        <div class="border-t pt-4">
-                            <h4 class="font-medium mb-2">Detail Pemeriksaan</h4>
-                            <ul class="text-sm space-y-1">
-                                <li>Kondisi Tabung: Baik (Tidak ada keretakan, goresan)</li>
-                                <li>Tekanan: Abnormal (Indikator merah/kuning)</li>
-                                <li>Konektor: Tidak bocor</li>
-                                <li>Tanda Pemakaian: Pernah dipakai</li>
-                                <li>Inspektur: K3RS</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('gizi')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">INSTALASI GIZI</h3>
-                    <p class="text-sm text-gray-600">Instalasi Gizi</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Perlu Perbaikan</span>
-                    </div>
-                    <div id="gizi-detail" class="report-detail mt-4">
-                        <div class="border-t pt-4">
-                            <h4 class="font-medium mb-2">Detail Pemeriksaan</h4>
-                            <ul class="text-sm space-y-1">
-                                <li>Kondisi Tabung: Baik (Tidak ada keretakan, goresan)</li>
-                                <li>Tekanan: Abnormal (Indikator merah/kuning)</li>
-                                <li>Konektor: Tidak bocor</li>
-                                <li>Tanda Pemakaian: Pernah dipakai</li>
-                                <li>Inspektur: K3RS</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('ipsrs')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">IPSRS</h3>
-                    <p class="text-sm text-gray-600">Instalasi Pelayanan Rawat Inap</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Perlu Perbaikan</span>
-                    </div>
-                    <div id="ipsrs-detail" class="report-detail mt-4">
-                        <div class="border-t pt-4">
-                            <h4 class="font-medium mb-2">Detail Pemeriksaan</h4>
-                            <ul class="text-sm space-y-1">
-                                <li>Kondisi Tabung: Baik (Tidak ada keretakan, goresan)</li>
-                                <li>Tekanan: Abnormal (Indikator merah/kuning)</li>
-                                <li>Konektor: Tidak bocor</li>
-                                <li>Tanda Pemakaian: Pernah dipakai</li>
-                                <li>Inspektur: K3RS</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Other Rooms -->
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('anggrek')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">ANGGREK</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('apotek')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">APOTEK/FARMASI</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('binatu')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">BINATU</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('crisant')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">CRYSANT</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('dahlia')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">DAHLIA</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('edelweis')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">EDELWEIS</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('fisioterapi')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">FISIOTERAPI</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('gudang-apotek')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">GUDANG APOTEK</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('ibs')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">IBS</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('icu')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">ICU</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('igd-vk')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">IGD VK</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('isolas')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">ISOLASI</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('pemulasaran')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">PEMULASARAN JENAZAH</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('poliklinik')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">POLIKLINIK</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('pos-satpam')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">POS SATPAM</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('radiologi')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">RADIOLODI</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('nicu')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">NICU</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-                
-                <div class="room-card bg-white rounded-lg shadow p-6" onclick="toggleRoomDetail('laboratorium')">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">LABORATORIUM</h3>
-                    <p class="text-sm text-gray-600">Tidak ada APAR</p>
-                    <div class="mt-4">
-                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Tidak Ada APAR</span>
-                    </div>
-                </div>
-            </div>
-        </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="gradient-footer text-white py-6 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="mb-4 md:mb-0">
-                    <p class="text-sm">&copy; 2024 RSUD Talaud. Hak Cipta Dilindungi.</p>
-                </div>
-                <div class="flex space-x-4">
-                    <a href="#" class="text-white hover:text-gray-200 transition">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="text-white hover:text-gray-200 transition">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="text-white hover:text-gray-200 transition">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                </div>
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="glass rounded-xl p-6 w-full max-w-md modal-enter">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold" id="modalTitle">Tambah Data</h2>
+                <button id="closeModal" class="hover:bg-white/10 rounded-lg p-2 transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            <form id="form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nama</label>
+                        <input type="text" id="nama" required class="form-input w-full px-4 py-2 rounded-lg text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">NIP</label>
+                        <input type="text" id="nip" required class="form-input w-full px-4 py-2 rounded-lg text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Divisi</label>
+                        <select id="divisi" required class="form-input w-full px-4 py-2 rounded-lg text-white">
+                            <option value="">Pilih Divisi</option>
+                            <option value="Satpam">Satpam</option>
+                            <option value="Sopir">Sopir</option>
+                            <option value="Kebersihan">Kebersihan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Status</label>
+                        <select id="status" required class="form-input w-full px-4 py-2 rounded-lg text-white">
+                            <option value="Aktif">Aktif</option>
+                            <option value="Tidak Aktif">Tidak Aktif</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex space-x-3 mt-6">
+                    <button type="button" id="cancelBtn" class="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-all">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary px-4 py-2 rounded-lg text-white font-medium transition-all">
+                        Simpan
+                    </button>
+                </div>
+            </form>
         </div>
-    </footer>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden transform translate-y-full transition-transform">
+        <i class="fas fa-check-circle mr-2"></i>
+        <span id="toastMessage">Berhasil!</span>
+    </div>
 
     <script>
-        // Initialize data
-        const monthlyData = {
-            igd: {
-                januari: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                februari: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                maret: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                april: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                mei: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                juni: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                juli: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                agustus: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                september: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                oktober: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                november: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                desember: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' }
-            },
-            medrec: {
-                januari: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                februari: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                maret: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                april: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                mei: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                juni: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                juli: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                agustus: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                september: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                oktober: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                november: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                desember: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' }
-            },
-            kantor: {
-                januari: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                februari: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                maret: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                april: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                mei: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                juni: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                juli: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                agustus: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                september: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                oktober: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                november: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                desember: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' }
-            },
-            gizi: {
-                januari: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                februari: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                maret: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                april: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                mei: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                juni: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                juli: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                agustus: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                september: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                oktober: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                november: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                desember: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' }
-            },
-            ipsrs: {
-                januari: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                februari: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                maret: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                april: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                mei: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                juni: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                juli: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                agustus: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                september: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                oktober: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                november: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' },
-                desember: { status: 'perbaikan', kondisi: 'Baik', tekanan: 'Abnormal', konektor: 'Tidak bocor', pemakaian: 'Pernah dipakai' }
-            }
+        // Google Drive API Configuration
+        const CLIENT_ID = 'YOUR_CLIENT_ID'; // Ganti dengan Client ID Anda
+        const API_KEY = 'YOUR_API_KEY'; // Ganti dengan API Key Anda
+        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+        const FOLDER_ID = '1zWtn8b9lqhnuyy_Tk8tKRhaJ9m-hUE2R'; // Folder ID dari URL yang Anda berikan
+        const FILE_NAME = 'RSUD_Talaud_Data.xlsx';
+        
+        let gapi = null;
+        let googleDriveConnected = false;
+        
+        // Data storage
+        let data = {
+            satpam: [
+                { id: 1, nama: 'Ahmad Fauzi', nip: '198001012019011001', status: 'Aktif' },
+                { id: 2, nama: 'Budi Santoso', nip: '198502022020022002', status: 'Aktif' },
+                { id: 3, nama: 'Cahyono', nip: '199003032021033003', status: 'Tidak Aktif' }
+            ],
+            sopir: [
+                { id: 4, nama: 'Dedi Pratama', nip: '198104042022044004', status: 'Aktif' },
+                { id: 5, nama: 'Eko Saputra', nip: '198205052023055005', status: 'Aktif' }
+            ],
+            kebersihan: [
+                { id: 6, nama: 'Fina Sari', nip: '198306062024066006', status: 'Aktif' },
+                { id: 7, nama: 'Gita Wulandari', nip: '198407072025077007', status: 'Aktif' },
+                { id: 8, nama: 'Hendra Wijaya', nip: '198508082026088008', status: 'Tidak Aktif' }
+            ]
         };
 
-        // Navigation
-        function showSection(section) {
-            // Hide all sections
-            document.getElementById('dashboardSection').classList.add('hidden');
-            document.getElementById('reportsSection').classList.add('hidden');
-            
-            // Show selected section
-            document.getElementById(section + 'Section').classList.remove('hidden');
-            
-            // Update nav buttons
-            document.querySelectorAll('.nav-link').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.closest('.nav-link').classList.add('active');
-            
-            // Initialize charts if dashboard
-            if (section === 'dashboard') {
-                initializeCharts();
-            }
-        }
-
-        // Initialize Charts
-        function initializeCharts() {
-            // Status Chart
-            const statusCtx = document.getElementById('statusChart').getContext('2d');
-            new Chart(statusCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Valid', 'Perbaikan', 'Tidak Valid', 'Tidak Ada APAR'],
-                    datasets: [{
-                        data: [15, 5, 2, 15],
-                        backgroundColor: [
-                            'rgba(34, 197, 94, 0.8)',
-                            'rgba(251, 191, 36, 0.8)',
-                            'rgba(239, 68, 68, 0.8)',
-                            'rgba(156, 163, 175, 0.8)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-
-            // Trend Chart
-            const trendCtx = document.getElementById('trendChart').getContext('2d');
-            new Chart(trendCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-                    datasets: [{
-                        label: 'Total Inspeksi',
-                        data: [22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22],
-                        borderColor: 'rgb(99, 102, 241)',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
-            });
-        }
-
-        // Toggle room detail
-        function toggleRoomDetail(roomId) {
-            const detailElement = document.getElementById(roomId + '-detail');
-            detailElement.classList.toggle('active');
-            
-            // Add animation
-            if (detailElement.classList.contains('active')) {
-                detailElement.classList.add('slide-in');
-            }
-        }
-
-        // Logout
-        function logout() {
-            if (confirm('Apakah Anda yakin ingin keluar?')) {
-                window.location.reload();
-            }
-        }
+        let currentTab = 'satpam';
+        let editingId = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            initializeCharts();
+            renderTable();
+            updateCounts();
+            setupEventListeners();
+            setupTabs();
+            initGoogleDrive();
         });
+
+        // Initialize Google Drive API
+        function initGoogleDrive() {
+            gapi.load('client:auth2', () => {
+                gapi.client.init({
+                    apiKey: API_KEY,
+                    clientId: CLIENT_ID,
+                    discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
+                    scope: SCOPES
+                }).then(() => {
+                    // Check if user is already signed in
+                    const authInstance = gapi.auth2.getAuthInstance();
+                    const isSignedIn = authInstance.isSignedIn.get();
+                    
+                    if (isSignedIn) {
+                        googleDriveConnected = true;
+                        updateGoogleDriveStatus();
+                    }
+                });
+            });
+        }
+
+        // Update Google Drive connection status
+        function updateGoogleDriveStatus() {
+            const statusElement = document.getElementById('googleDriveStatus');
+            const connectButton = document.getElementById('connectGoogleDrive');
+            
+            if (googleDriveConnected) {
+                statusElement.className = 'google-drive-status google-drive-connected';
+                statusElement.innerHTML = '<i class="fas fa-check-circle mr-2"></i><span>Google Drive: Tersambung</span>';
+                connectButton.style.display = 'none';
+            } else {
+                statusElement.className = 'google-drive-status google-drive-disconnected';
+                statusElement.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i><span>Google Drive: Belum Tersambung</span>';
+                connectButton.style.display = 'inline-block';
+            }
+        }
+
+        // Setup tabs
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const indicator = document.querySelector('.tab-indicator');
+            
+            tabs.forEach((tab, index) => {
+                tab.addEventListener('click', function() {
+                    currentTab = this.dataset.tab;
+                    updateActiveTab();
+                    renderTable();
+                });
+            });
+
+            updateActiveTab();
+        }
+
+        function updateActiveTab() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const indicator = document.querySelector('.tab-indicator');
+            
+            tabs.forEach(tab => {
+                tab.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-purple-500', 'text-white');
+                tab.classList.add('hover:bg-white/10');
+            });
+
+            const activeTab = document.querySelector(`[data-tab="${currentTab}"]`);
+            activeTab.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-purple-500', 'text-white');
+            activeTab.classList.remove('hover:bg-white/10');
+
+            // Update indicator position
+            const tabRect = activeTab.getBoundingClientRect();
+            const containerRect = activeTab.parentElement.getBoundingClientRect();
+            indicator.style.width = `${tabRect.width}px`;
+            indicator.style.transform = `translateX(${tabRect.left - containerRect.left}px)`;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Modal controls
+            document.getElementById('addBtn').addEventListener('click', openModal);
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+            document.getElementById('modal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+
+            // Form submission
+            document.getElementById('form').addEventListener('submit', handleSubmit);
+
+            // Search
+            document.getElementById('searchInput').addEventListener('input', function() {
+                renderTable(this.value);
+            });
+
+            // Export
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            
+            // Google Drive connection
+            document.getElementById('connectGoogleDrive').addEventListener('click', connectToGoogleDrive);
+        }
+
+        // Connect to Google Drive
+        function connectToGoogleDrive() {
+            gapi.auth2.getAuthInstance().signIn().then(() => {
+                googleDriveConnected = true;
+                updateGoogleDriveStatus();
+                showToast('Google Drive berhasil tersambung!');
+            }).catch(error => {
+                console.error('Error connecting to Google Drive:', error);
+                showToast('Gagal tersambung ke Google Drive', 'error');
+            });
+        }
+
+        // Save data to Google Drive
+        async function saveToGoogleDrive() {
+            if (!googleDriveConnected) {
+                showToast('Silakan sambungkan Google Drive terlebih dahulu', 'error');
+                return;
+            }
+
+            try {
+                // Create workbook with three sheets
+                const wb = XLSX.utils.book_new();
+                
+                // Create data for each category
+                const satpamData = data.satpam.map((item, index) => ({
+                    'No': index + 1,
+                    'Nama': item.nama,
+                    'NIP': item.nip,
+                    'Status': item.status
+                }));
+                
+                const sopirData = data.sopir.map((item, index) => ({
+                    'No': index + 1,
+                    'Nama': item.nama,
+                    'NIP': item.nip,
+                    'Status': item.status
+                }));
+                
+                const kebersihanData = data.kebersihan.map((item, index) => ({
+                    'No': index + 1,
+                    'Nama': item.nama,
+                    'NIP': item.nip,
+                    'Status': item.status
+                }));
+                
+                // Create sheets
+                const wsSatpam = XLSX.utils.json_to_sheet(satpamData);
+                const wsSopir = XLSX.utils.json_to_sheet(sopirData);
+                const wsKebersihan = XLSX.utils.json_to_sheet(kebersihanData);
+                
+                // Add sheets to workbook
+                XLSX.utils.book_append_sheet(wb, wsSatpam, 'Satpam');
+                XLSX.utils.book_append_sheet(wb, wsSopir, 'Sopir');
+                XLSX.utils.book_append_sheet(wb, wsKebersihan, 'Kebersihan');
+                
+                // Generate Excel file
+                const excelData = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([excelData], { type: 'application/octet-stream' });
+                
+                // Check if file exists
+                const fileList = await gapi.client.drive.files.list({
+                    q: `name='${FILE_NAME}' and parents in '${FOLDER_ID}' and trashed=false`,
+                    fields: 'files(id, name)'
+                });
+                
+                if (fileList.result.files.length > 0) {
+                    // File exists, update it
+                    const fileId = fileList.result.files[0].id;
+                    await gapi.client.drive.files.update({
+                        fileId: fileId,
+                        media: {
+                            mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            body: blob
+                        }
+                    });
+                    showToast('Data berhasil diperbarui di Google Drive!');
+                } else {
+                    // File doesn't exist, create it
+                    const metadata = {
+                        name: FILE_NAME,
+                        parents: [FOLDER_ID],
+                        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    };
+                    
+                    await gapi.client.drive.files.create({
+                        resource: metadata,
+                        media: {
+                            mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            body: blob
+                        }
+                    });
+                    showToast('Data berhasil disimpan ke Google Drive!');
+                }
+            } catch (error) {
+                console.error('Error saving to Google Drive:', error);
+                showToast('Gagal menyimpan data ke Google Drive', 'error');
+            }
+        }
+
+        // Render table
+        function renderTable(searchTerm = '') {
+            const tbody = document.getElementById('dataTable');
+            const currentData = data[currentTab] || [];
+            
+            let filteredData = currentData;
+            if (searchTerm) {
+                filteredData = currentData.filter(item => 
+                    item.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    item.nip.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+
+            tbody.innerHTML = filteredData.map((item, index) => `
+                <tr class="border-b border-gray-700 hover:bg-white/5 transition-all">
+                    <td class="py-3 px-4">${index + 1}</td>
+                    <td class="py-3 px-4 font-medium">${item.nama}</td>
+                    <td class="py-3 px-4 text-gray-400">${item.nip}</td>
+                    <td class="py-3 px-4">
+                        <span class="status-badge ${item.status === 'Aktif' ? 'status-active' : 'status-inactive'}">
+                            ${item.status}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <button onclick="editItem(${item.id})" class="text-blue-400 hover:text-blue-300 mr-3 transition-all">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteItem(${item.id})" class="text-red-400 hover:text-red-300 transition-all">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update counts
+        function updateCounts() {
+            document.getElementById('satpamCount').textContent = data.satpam.length;
+            document.getElementById('sopirCount').textContent = data.sopir.length;
+            document.getElementById('kebersihanCount').textContent = data.kebersihan.length;
+        }
+
+        // Modal functions
+        function openModal(id = null) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('form');
+            
+            editingId = id;
+            
+            if (id) {
+                title.textContent = 'Edit Data';
+                const item = findItem(id);
+                if (item) {
+                    document.getElementById('nama').value = item.nama;
+                    document.getElementById('nip').value = item.nip;
+                    document.getElementById('divisi').value = currentTab;
+                    document.getElementById('status').value = item.status;
+                }
+            } else {
+                title.textContent = 'Tambah Data';
+                form.reset();
+                document.getElementById('divisi').value = currentTab;
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('hidden');
+            editingId = null;
+        }
+
+        // Find item
+        function findItem(id) {
+            const currentData = data[currentTab] || [];
+            return currentData.find(item => item.id === id);
+        }
+
+        // Handle form submission
+        function handleSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                nama: document.getElementById('nama').value,
+                nip: document.getElementById('nip').value,
+                status: document.getElementById('status').value
+            };
+
+            if (editingId) {
+                // Update existing item
+                const currentData = data[currentTab] || [];
+                const index = currentData.findIndex(item => item.id === editingId);
+                if (index !== -1) {
+                    currentData[index] = { ...currentData[index], ...formData };
+                }
+                showToast('Data berhasil diperbarui!');
+            } else {
+                // Add new item
+                const newId = Math.max(...Object.values(data).flat().map(item => item.id), 0) + 1;
+                data[currentTab].push({ id: newId, ...formData });
+                showToast('Data berhasil ditambahkan!');
+            }
+
+            closeModal();
+            renderTable();
+            updateCounts();
+            
+            // Save to Google Drive
+            saveToGoogleDrive();
+        }
+
+        // Edit item
+        function editItem(id) {
+            openModal(id);
+        }
+
+        // Delete item
+        function deleteItem(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                const currentData = data[currentTab] || [];
+                data[currentTab] = currentData.filter(item => item.id !== id);
+                renderTable();
+                updateCounts();
+                showToast('Data berhasil dihapus!');
+                
+                // Save to Google Drive
+                saveToGoogleDrive();
+            }
+        }
+
+        // Show toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            
+            if (type === 'error') {
+                toast.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full transition-transform';
+            } else {
+                toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full transition-transform';
+            }
+            
+            toast.classList.remove('hidden', 'translate-y-full');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-full');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 3000);
+        }
+
+        // Export data
+        function exportData() {
+            const currentData = data[currentTab] || [];
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + "Nama,NIP,Status\n"
+                + currentData.map(item => `${item.nama},${item.nip},${item.status}`).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `data_${currentTab}_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('Data berhasil diekspor!');
+        }
     </script>
 </body>
 </html>
